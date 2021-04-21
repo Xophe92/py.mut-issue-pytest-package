@@ -1,20 +1,16 @@
-# Behaviour differences btw pytest and unisttest
+# Mutpy : behaviour differences  pytest vs. unittest
 
 TLDR 
 
-```bash
-Issue : The -m shows actual mutations are considered but not really applied (?) as all mutations survive.
-```
-[Jump to details of this : behaviour with pytest](#behaviour-with-pytest)
+
+* **Issue** : The -m shows actual mutations are considered but not really applied (?) as all mutations survive. [Details here](#behaviour-with-pytest)
+
+* **Benchmark** : the same kind of tests in unittest kill all mutations. [Details here](#behaviour-with-unittest)
 
 
-Behaviour with unittest
-```bash
-Benchmark : the same kind of tests in unittest kill all mutations.
-```
-[Jump to details of this : behaviour with unittest](#behaviour-with-unittest)
 
-To reproduce the issue:
+
+## Set up the environment
 
 git clone this repository then install the package in editable mode:
 
@@ -202,6 +198,9 @@ The mutations are actually performed but are not killed:
    - timeout: 0 (0.0%)
 
 ```
+
+**All mutants survived.**
+
 ## Behaviour with unittest
 To benchmark this behaviour against the more mature unittest runner, I also created tests in unittest
 
@@ -359,3 +358,5 @@ To benchmark this behaviour against the more mature unittest runner, I also crea
    - incompetent: 2 (18.2%)
    - timeout: 0 (0.0%)
 ```
+
+**No mutant survided.**
