@@ -12,7 +12,13 @@ def test_fibonacci_main_use_case(n, expected):
     assert fibonacci(n) == expected
 
 
-def test_fibonacci_nagative():
+def test_fibonacci_zero():
+    with pytest.raises(ValueError):
+        fibonacci(0)
+
+
+
+def test_fibonacci_negative():
     with pytest.raises(ValueError):
         fibonacci(-1)
 

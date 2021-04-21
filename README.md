@@ -1,6 +1,18 @@
-# mut.py-issue-pytest-package
+# Behaviour differences btw pytest and unisttest
 
-I have problems to kill mutants when using a package installed in editable mode.
+TLDR 
+
+```bash
+Issue : The -m shows actual mutations are considered but not really applied (?) as all mutations survive.
+```
+[Jump to details of this : behaviour with pytest](#behaviour-with-pytest)
+
+
+Behaviour with unittest
+```bash
+Benchmark : the same kind of tests in unittest kill all mutations.
+```
+[Jump to details of this : behaviour with unittest](#behaviour-with-unittest)
 
 To reproduce the issue:
 
@@ -19,14 +31,15 @@ pytest to make sure everything works as expected:
 ==================================================================================================== test session starts ====================================================================================================
 platform win32 -- Python 3.8.8, pytest-6.2.3, py-1.10.0, pluggy-0.13.1
 rootdir: C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package
-collected 6 items
+collected 13 items
 
-src\tests\test_main_module.py ......                                                                                                                                                                                   [100%] 
+src\tests\test_pytest.py .......                                                                                                                                                                                       [ 53%] 
+src\tests\test_unittest.py ......                                                                                                                                                                                      [100%]
 
-===================================================================================================== 6 passed in 0.06s ===================================================================================================== 
+==================================================================================================== 13 passed in 0.13s ===================================================================================================== 
 ```
 
-
+## Behaviour with pytest
 python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
 
 (I do not know why the script is not identified as such: when I directly use the command py.mut, it just opens the file in notepad... so I added python... before)
@@ -35,12 +48,12 @@ python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tes
 The mutations are actually performed but are not killed:
 
 ```bash
-(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
+(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_pytest.py -m      
 [*] Start mutation process:
    - targets: demo.main
-   - tests: src\tests\test_main_module.py
-[*] 6 tests passed:
-   - test_main_module [0.10408 s]
+   - tests: src\tests\test_pytest.py
+[*] 7 tests passed:
+   - test_pytest [0.11261 s]
 [*] Start mutants generation and execution:
    - [#   1] AOR demo.main:
 --------------------------------------------------------------------------------
@@ -51,7 +64,7 @@ The mutations are actually performed but are not killed:
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n + 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07096 s] survived
+[0.07141 s] survived
    - [#   2] AOR demo.main: 
 --------------------------------------------------------------------------------
   14:             f'Fibonacci is only defined on positive integers, {n} given.')
@@ -61,7 +74,7 @@ The mutations are actually performed but are not killed:
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n - 1) - fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.06696 s] survived
+[0.06882 s] survived
    - [#   3] AOR demo.main: 
 --------------------------------------------------------------------------------
   14:             f'Fibonacci is only defined on positive integers, {n} given.')
@@ -71,7 +84,7 @@ The mutations are actually performed but are not killed:
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n - 1) + fibonacci(n + 2)
 --------------------------------------------------------------------------------
-[0.08074 s] survived
+[0.08190 s] survived
    - [#   4] COD demo.main: 
 --------------------------------------------------------------------------------
    5:         n (int): The fibonacci number to compute.
@@ -85,7 +98,7 @@ The mutations are actually performed but are not killed:
   12:     if n <= 0:
   13:         raise ValueError(
 --------------------------------------------------------------------------------
-[0.06962 s] survived
+[0.06852 s] survived
    - [#   5] COI demo.main: 
 --------------------------------------------------------------------------------
    5:         n (int): The fibonacci number to compute.
@@ -98,161 +111,8 @@ The mutations are actually performed but are not killed:
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
   12:     if n <= 0:
   13:         raise ValueError(
---------------------------------------------------------------------------------
-[0.06903 s] survived
-   - [#   6] COI demo.main: 
---------------------------------------------------------------------------------
-   8:     '''
-   9:     if not (isinstance(n, int)):
-  10:         raise TypeError(
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-- 12:     if n <= 0:
-+ 12:     if not (n <= 0):
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
---------------------------------------------------------------------------------
-[0.07246 s] survived
-   - [#   7] COI demo.main: 
---------------------------------------------------------------------------------
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-  12:     if n <= 0:
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-- 15:     if n <= 2:
-+ 15:     if not (n <= 2):
-  16:         return n
-  17:     else:
-  18:         return fibonacci(n - 1) + fibonacci(n - 2)
---------------------------------------------------------------------------------
-[0.06997 s] survived
-   - [#   8] ROR demo.main: 
---------------------------------------------------------------------------------
-   8:     '''
-   9:     if not (isinstance(n, int)):
-  10:         raise TypeError(
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-- 12:     if n <= 0:
-+ 12:     if n >= 0:
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
---------------------------------------------------------------------------------
-[0.06903 s] survived
-   - [#   9] ROR demo.main: 
---------------------------------------------------------------------------------
-   8:     '''
-   9:     if not (isinstance(n, int)):
-  10:         raise TypeError(
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-- 12:     if n <= 0:
-+ 12:     if n < 0:
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
---------------------------------------------------------------------------------
-[0.06896 s] survived
-   - [#  10] ROR demo.main: 
---------------------------------------------------------------------------------
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-  12:     if n <= 0:
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-- 15:     if n <= 2:
-+ 15:     if n >= 2:
-  16:         return n
-  17:     else:
-  18:         return fibonacci(n - 1) + fibonacci(n - 2)
---------------------------------------------------------------------------------
-[0.06686 s] survived
-   - [#  11] ROR demo.main: 
---------------------------------------------------------------------------------
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-  12:     if n <= 0:
-  13:         raise ValueError(
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-- 15:     if n <= 2:
-+ 15:     if n < 2:
-  16:         return n
-  17:     else:
-  18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
 [0.07094 s] survived
-[*] Mutation score [1.02833 s]: 0.0%
-   - all: 11
-   - killed: 0 (0.0%)
-   - survived: 11 (100.0%)
-   - incompetent: 0 (0.0%)
-   - timeout: 0 (0.0%)
-
-(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
-[*] Start mutation process:
-   - targets: demo.main
-   - tests: src\tests\test_main_module.py
-[*] 6 tests passed:
-   - test_main_module [0.10109 s]
-[*] Start mutants generation and execution:
-   - [#   1] AOR demo.main:
---------------------------------------------------------------------------------
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
-  17:     else:
-- 18:         return fibonacci(n - 1) + fibonacci(n - 2)
-+ 18:         return fibonacci(n + 1) + fibonacci(n - 2)
---------------------------------------------------------------------------------
-[0.07136 s] survived
-   - [#   2] AOR demo.main: 
---------------------------------------------------------------------------------
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
-  17:     else:
-- 18:         return fibonacci(n - 1) + fibonacci(n - 2)
-+ 18:         return fibonacci(n - 1) - fibonacci(n - 2)
---------------------------------------------------------------------------------
-[0.07181 s] survived
-   - [#   3] AOR demo.main: 
---------------------------------------------------------------------------------
-  14:             f'Fibonacci is only defined on positive integers, {n} given.')
-  15:     if n <= 2:
-  16:         return n
-  17:     else:
-- 18:         return fibonacci(n - 1) + fibonacci(n - 2)
-+ 18:         return fibonacci(n - 1) + fibonacci(n + 2)
---------------------------------------------------------------------------------
-[0.08471 s] survived
-   - [#   4] COD demo.main: 
---------------------------------------------------------------------------------
-   5:         n (int): The fibonacci number to compute.
-   6:     Returns:
-   7:         Optional[int]: The n-th fibonacci number is n is positive int, None otherwise.
-   8:     '''
--  9:     if not (isinstance(n, int)):
-+  9:     if isinstance(n, int):
-  10:         raise TypeError(
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-  12:     if n <= 0:
-  13:         raise ValueError(
---------------------------------------------------------------------------------
-[0.06796 s] survived
-   - [#   5] COI demo.main: 
---------------------------------------------------------------------------------
-   5:         n (int): The fibonacci number to compute.
-   6:     Returns:
-   7:         Optional[int]: The n-th fibonacci number is n is positive int, None otherwise.
-   8:     '''
--  9:     if not (isinstance(n, int)):
-+  9:     if not ((not (isinstance(n, int)))):
-  10:         raise TypeError(
-  11:             f'Fibonacci is only defined on integers, {type(n)} given.')
-  12:     if n <= 0:
-  13:         raise ValueError(
---------------------------------------------------------------------------------
-[0.06998 s] survived
    - [#   6] COI demo.main: 
 --------------------------------------------------------------------------------
    8:     '''
@@ -266,7 +126,7 @@ The mutations are actually performed but are not killed:
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.06860 s] survived
+[0.07158 s] survived
    - [#   7] COI demo.main: 
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
@@ -279,7 +139,7 @@ The mutations are actually performed but are not killed:
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07321 s] survived
+[0.07323 s] survived
    - [#   8] ROR demo.main: 
 --------------------------------------------------------------------------------
    8:     '''
@@ -293,7 +153,7 @@ The mutations are actually performed but are not killed:
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.06996 s] survived
+[0.07290 s] survived
    - [#   9] ROR demo.main: 
 --------------------------------------------------------------------------------
    8:     '''
@@ -307,7 +167,7 @@ The mutations are actually performed but are not killed:
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.06960 s] survived
+[0.07296 s] survived
    - [#  10] ROR demo.main: 
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
@@ -320,7 +180,7 @@ The mutations are actually performed but are not killed:
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07080 s] survived
+[0.06948 s] survived
    - [#  11] ROR demo.main: 
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
@@ -333,29 +193,27 @@ The mutations are actually performed but are not killed:
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07196 s] survived
-[*] Mutation score [1.04413 s]: 0.0%
+[0.07296 s] survived
+[*] Mutation score [1.05929 s]: 0.0%
    - all: 11
    - killed: 0 (0.0%)
    - survived: 11 (100.0%)
    - incompetent: 0 (0.0%)
    - timeout: 0 (0.0%)
 
-(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --runner pytest --target demo.main --unit-test . -m                              
-[*] Start mutation process:
-   - targets: demo.main
-   - tests: .
-usage: mut.py [-h] [-c]
-mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit-test . -m
+```
+## Behaviour with unittest
+To benchmark this behaviour against the more mature unittest runner, I also created tests in unittest
 
-(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
+```bash
+(env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>python env\Scripts\mut.py --target demo.main --unit-test src\tests\test_unittest.py -m                 
 [*] Start mutation process:
    - targets: demo.main
-   - tests: src\tests\test_main_module.py
+   - tests: src\tests\test_unittest.py
 [*] 6 tests passed:
-   - test_main_module [0.10480 s]
+   - test_unittest [0.00000 s]
 [*] Start mutants generation and execution:
-   - [#   1] AOR demo.main:
+   - [#   1] AOR demo.main: 
 --------------------------------------------------------------------------------
   14:             f'Fibonacci is only defined on positive integers, {n} given.')
   15:     if n <= 2:
@@ -364,7 +222,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n + 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07113 s] survived
+[0.38178 s] killed by test_fib4 (test_unittest.TestFibonacci)
    - [#   2] AOR demo.main: 
 --------------------------------------------------------------------------------
   14:             f'Fibonacci is only defined on positive integers, {n} given.')
@@ -374,8 +232,8 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n - 1) - fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07096 s] survived
-   - [#   3] AOR demo.main: 
+[0.00100 s] killed by test_fib4 (test_unittest.TestFibonacci)
+   - [#   3] AOR demo.main:
 --------------------------------------------------------------------------------
   14:             f'Fibonacci is only defined on positive integers, {n} given.')
   15:     if n <= 2:
@@ -384,7 +242,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
 - 18:         return fibonacci(n - 1) + fibonacci(n - 2)
 + 18:         return fibonacci(n - 1) + fibonacci(n + 2)
 --------------------------------------------------------------------------------
-[0.08095 s] survived
+[0.37880 s] killed by test_fib4 (test_unittest.TestFibonacci)
    - [#   4] COD demo.main: 
 --------------------------------------------------------------------------------
    5:         n (int): The fibonacci number to compute.
@@ -398,7 +256,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   12:     if n <= 0:
   13:         raise ValueError(
 --------------------------------------------------------------------------------
-[0.07174 s] survived
+[0.00100 s] incompetent
    - [#   5] COI demo.main: 
 --------------------------------------------------------------------------------
    5:         n (int): The fibonacci number to compute.
@@ -412,7 +270,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   12:     if n <= 0:
   13:         raise ValueError(
 --------------------------------------------------------------------------------
-[0.06796 s] survived
+[0.00100 s] incompetent
    - [#   6] COI demo.main: 
 --------------------------------------------------------------------------------
    8:     '''
@@ -426,8 +284,8 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.06977 s] survived
-   - [#   7] COI demo.main: 
+[0.00100 s] killed by test_fib1 (test_unittest.TestFibonacci)
+   - [#   7] COI demo.main:
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
   12:     if n <= 0:
@@ -439,7 +297,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.06691 s] survived
+[0.00300 s] killed by test_fib1 (test_unittest.TestFibonacci)
    - [#   8] ROR demo.main: 
 --------------------------------------------------------------------------------
    8:     '''
@@ -453,8 +311,8 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.09195 s] survived
-   - [#   9] ROR demo.main: 
+[0.00302 s] killed by test_fib1 (test_unittest.TestFibonacci)
+   - [#   9] ROR demo.main:
 --------------------------------------------------------------------------------
    8:     '''
    9:     if not (isinstance(n, int)):
@@ -467,7 +325,7 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   15:     if n <= 2:
   16:         return n
 --------------------------------------------------------------------------------
-[0.06896 s] survived
+[0.00100 s] killed by test_fibonacci_zero (test_unittest.TestFibonacci)
    - [#  10] ROR demo.main: 
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
@@ -480,8 +338,8 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.06997 s] survived
-   - [#  11] ROR demo.main: 
+[0.00202 s] killed by test_fib1 (test_unittest.TestFibonacci)
+   - [#  11] ROR demo.main:
 --------------------------------------------------------------------------------
   11:             f'Fibonacci is only defined on integers, {type(n)} given.')
   12:     if n <= 0:
@@ -493,11 +351,11 @@ mut.py: error: unrecognized arguments: --runner pytest --target demo.main --unit
   17:     else:
   18:         return fibonacci(n - 1) + fibonacci(n - 2)
 --------------------------------------------------------------------------------
-[0.07213 s] survived
-[*] Mutation score [1.04778 s]: 0.0%
+[0.00202 s] killed by test_fib2 (test_unittest.TestFibonacci)
+[*] Mutation score [0.92760 s]: 100.0%
    - all: 11
-   - killed: 0 (0.0%)
-   - survived: 11 (100.0%)
-   - incompetent: 0 (0.0%)
+   - killed: 9 (81.8%)
+   - survived: 0 (0.0%)
+   - incompetent: 2 (18.2%)
    - timeout: 0 (0.0%)
 ```
