@@ -3,7 +3,7 @@
 TLDR 
 
 
-* **Issue** : With the pytet runner and test suite, actual mutations are considered (as showed bu the -m fmag in the command line) but not really applied (?) as all mutations survive. [Details here](#behaviour-with-pytest)
+* **Issue** : With the pytet runner and test suite, actual mutations are considered (as showed by the -m flag in the command line) but not really applied (?) as all mutations survive. [Details here](#behaviour-with-pytest)
 
 * **Benchmark** : the same kind of tests in unittest kill all mutations. [Details here](#behaviour-with-unittest)
 
