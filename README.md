@@ -3,7 +3,7 @@
 TLDR 
 
 
-* **Issue** : The -m shows actual mutations are considered but not really applied (?) as all mutations survive. [Details here](#behaviour-with-pytest)
+* **Issue** : With the pytet runner and test suite, actual mutations are considered (as showed bu the -m fmag in the command line) but not really applied (?) as all mutations survive. [Details here](#behaviour-with-pytest)
 
 * **Benchmark** : the same kind of tests in unittest kill all mutations. [Details here](#behaviour-with-unittest)
 
@@ -359,4 +359,4 @@ To benchmark this behaviour against the more mature unittest runner, I also crea
    - timeout: 0 (0.0%)
 ```
 
-**No mutant survided.**
+**No mutant survived.**
