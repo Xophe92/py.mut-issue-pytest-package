@@ -4,13 +4,15 @@ I have problems to kill mutants when using a package installed in editable mode.
 
 To reproduce the issue:
 
-git clone this repository
+git clone this repository then install the package in editable mode:
 
 
 ```bash
+git clone git@github.com:Xophe92/py.mut-issue-pytest-package.git
+cd py.mut-issue-pytest-package
 pip install -e .
 ```
-pytest to make sure everything works
+pytest to make sure everything works as expected:
 
 ```bash
 (env) C:\Users\Christophe\Documents\Programmation\test_git\pymut\py.mut-issue-pytest-package>pytest
@@ -27,7 +29,7 @@ src\tests\test_main_module.py ......                                            
 
 python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
 
-(I do not know why the scipt is not identified as such whet I directly py.mut, it just open the file in notepad... so I added python... before)
+(I do not know why the script is not identified as such: when I directly use the command py.mut, it just opens the file in notepad... so I added python... before)
 
 
 The mutations are actually performed but are not killed:
