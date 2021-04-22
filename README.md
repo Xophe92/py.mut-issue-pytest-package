@@ -36,7 +36,6 @@ src\tests\test_unittest.py ......                                               
 ```
 
 ## Behaviour with pytest
-python env\Scripts\mut.py --runner pytest --target demo.main --unit-test src\tests\test_main_module.py -m
 
 (I do not know why the script is not identified as such: when I directly use the command py.mut, it just opens the file in notepad... so I added python... before)
 
